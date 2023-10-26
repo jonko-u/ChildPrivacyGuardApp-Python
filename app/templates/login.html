@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Login</title>
+</head>
+<body>
+    <h1>Login</h1>
+
+    <form method="POST" action="{{ url_for('auth.login') }}">
+        {{ form.hidden_tag() }}  <!-- Include CSRF token if using Flask-WTF -->
+        <div>
+            <label for="username">Username</label>
+            <input type="text" id="username" name="username" required>
+        </div>
+
+        <div>
+            <label for="password">Password</label>
+            <input type="password" id="password" name="password" required>
+        </div>
+
+        <div>
+            <button type="submit">Login</button>
+        </div>
+    </form>
+
+    <p>Don't have an account? <a href="{{ url_for('register') }}">Register</a></p>
+</body>
+</html>

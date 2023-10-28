@@ -8,7 +8,6 @@ __pycache__/
 *.pyo
 *.egg-info/
 dist/
-build/
 
 .vscode/
 .idea/

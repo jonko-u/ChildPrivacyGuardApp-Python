@@ -1,14 +1,14 @@
 from flask import Blueprint, render_template, redirect, url_for, flash, request
-from flask_login import login_user, logout_user, login_required
-# from .models import User  # Import the User model
+from flask_login import login_user, current_user, login_required, logout_user# from .models import User  # Import the User model
 # from . import db  # Import the database instance
 # from app import db
 # from app.models import User
-from app.forms import RegistrationForm
-from app import db
-from flask_login import UserMixin
+from app.forms import LoginForm, RegistrationForm
+from app.database import db
 from passlib.hash import sha256_crypt
 from app.models import User
+from app.models import UserLogin
+import logging
 
 auth_bp = Blueprint('auth', __name__)
 
@@ -31,20 +31,25 @@ def register():
 
 @auth_bp.route('/login', methods=['GET', 'POST'])
 def login():
-    if request.method == 'POST':
-        username = request.form['username']
-        password = request.form['password']
 
-        # user = User.query.filter_by(username=username).first()
+    form = LoginForm()  # Create an instance of the form
 
-        # if user and user.check_password(password):
-        #     login_user(user)
-        #     flash('Login successful', 'success')
-        #     return redirect(url_for('main.index'))
-        # else:
-        #     flash('Login failed. Please try again.', 'danger')
+    if form.validate_on_submit():  # Check if the form was submitted and is valid
+        username = form.username.data
+        password = form.password.data
 
-    return render_template('auth/login.html')
+        user = User.query.filter_by(username=username).first()
+        
+        is_pass_valid = sha256_crypt.verify(password, user.password)
+        logging.warning(is_pass_valid)
+        if user and is_pass_valid:     
+            user.is_active = True       
+            login_user(user)
+            return redirect(url_for('main.dashboard'))
+        else:
+            flash('Invalid username or password', 'danger')
+
+    return render_template('login.html', form=form)
 
 @auth_bp.route('/logout')
 @login_required

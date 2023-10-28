@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template
+from flask import Blueprint, render_template, request
 from flask_login import login_required
 
 main_bp = Blueprint('main', __name__)
@@ -14,4 +14,7 @@ def about():
 @main_bp.route('/dashboard')
 @login_required  # This route requires authentication
 def dashboard():
-    return render_template('main/dashboard.html')
+    # Retrieve the username from the query parameter
+    username = request.args.get('username')
+    
+    return render_template('main/dashboard.html', username=username)

@@ -1,11 +1,77 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Dashboard</title>
+    <title>Upload Picture</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            padding: 20px;
+        }
+        h1 {
+            color: #333;
+        }
+        form {
+            margin: 20px auto;
+            width: 300px;
+            padding: 20px;
+            border: 1px solid #ccc;
+            background: #f9f9f9;
+            border-radius: 5px;
+        }
+        input[type="file"] {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+        }
+        input[type="submit"] {
+            background-color: #337ab7;
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
+            cursor: pointer;
+        }
+        input[type="submit"]:hover {
+            background-color: #286090;
+        }
+    </style>
 </head>
 <body>
-    <h1>Dashboard</h1>
-    <!-- Add more content and features as needed -->
-    <p>WelcomE!!!!!!!!!</p>
+    <h1>Welcome to your Dashboard, {{ username }}</h1>
+    <form method="POST" action="/process" enctype="multipart/form-data" target="_blank">
+        <input type="file" name="image" id="imageInput">
+        <!-- Image preview container -->
+        <!-- Image preview container -->
+        <div id="imagePreview" style="margin-top: 10px;"></div>
+        <input type="submit" value="Upload and Process">
+    </form>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+        // Your JavaScript code here
+    
+            // JavaScript code to display image preview with Base64 data URI
+            document.getElementById('imageInput').addEventListener('change', function() {
+                const imagePreview = document.getElementById('imagePreview');
+                const file = this.files[0];
+
+                if (file) {
+                    const reader = new FileReader();
+
+                    reader.onload = function(e) {
+                        const img = document.createElement('img');
+                        img.src = e.target.result;
+                        img.style.maxWidth = '100%';
+                        imagePreview.innerHTML = '';
+                        imagePreview.appendChild(img);
+                    };
+
+                    reader.readAsDataURL(file);
+                } else {
+                    imagePreview.innerHTML = ''; // Clear the preview if no file is selected
+                }
+            });
+        });
+    </script>
 </body>
 </html>

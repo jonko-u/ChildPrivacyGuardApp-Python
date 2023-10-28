@@ -3,10 +3,12 @@ from flask import Blueprint
 # Import other modules or views as needed
 from app.routes.auth import auth_bp
 from app.routes.main import main_bp
+from app.routes.component import component_bp
 # ...
 # Create blueprints
 auth_bp = Blueprint('auth', __name__, url_prefix='/auth')
 main_bp = Blueprint('main', __name__, url_prefix='/main')
+component_bp = Blueprint('component', __name__, url_prefix='/component')
 # ...
 
 @auth_bp.route('/login', methods=['GET', 'POST'])

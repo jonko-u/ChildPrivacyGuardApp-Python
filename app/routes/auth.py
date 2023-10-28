@@ -45,7 +45,7 @@ def login():
         if user and is_pass_valid:     
             user.is_active = True       
             login_user(user)
-            return redirect(url_for('main.dashboard'))
+            return redirect(url_for('main.dashboard', username=username))
         else:
             flash('Invalid username or password', 'danger')
 

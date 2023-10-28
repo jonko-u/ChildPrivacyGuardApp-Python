@@ -36,9 +36,11 @@ def create_app():
     # Import and register blueprints
     from app.routes.main import main_bp
     from app.routes.auth import auth_bp
+    from app.routes.component import component_bp
 
     app.register_blueprint(main_bp)
     app.register_blueprint(auth_bp)
+    app.register_blueprint(component_bp)
     # Initialize the database with your app
     # Other app setup code can go 
     # with app.app_context():

@@ -2,6 +2,9 @@
 
 __pycache__/
 
+./app/__pycache__/
+/app/__pycache__/
+
 .pytest_cache/
 
 *.pyc

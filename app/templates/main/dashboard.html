@@ -1,11 +1,145 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Dashboard</title>
+    <title>Upload Picture</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            padding: 20px;
+        }
+        h1 {
+            color: #333;
+        }
+        form {
+            margin: 20px auto;
+            width: 300px;
+            padding: 20px;
+            border: 1px solid #ccc;
+            background: #f9f9f9;
+            border-radius: 5px;
+        }
+        input[type="file"] {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+        }
+        input[type="submit"] {
+            background-color: #337ab7;
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
+            cursor: pointer;
+        }
+        input[type="submit"]:hover {
+            background-color: #286090;
+        }
+        /* Watermark styling */
+        .watermark {
+            position: absolute;
+            font-size: 6px;
+            color: rgba(255, 255, 255, 1);
+            pointer-events: none;
+            display: none;
+        }
+        /* Log out button styling */
+        #logoutButton {
+            margin: 20px;
+        }
+    </style>
 </head>
 <body>
-    <h1>Dashboard</h1>
-    <!-- Add more content and features as needed -->
-    <p>WelcomE!!!!!!!!!</p>
+    <h1>Welcome to your Dashboard, {{ username }}</h1>
+    <!-- Log out button -->
+    <p>Client IP Address:</p>
+    <p id="ipAddress">Loading...</p>
+    <div id="logoutButton">
+        <button onclick="logout()">Log Out</button>
+    </div>
+    <form method="POST" action="/process" enctype="multipart/form-data" target="_blank">
+        <input type="file" name="image" id="imageInput">
+        <!-- Image preview container -->
+        <!-- Image preview container -->
+        <div id="imagePreviewContainer" style="position: relative;">
+            <div id="imagePreview" style="margin-top: 10px;"></div>
+        </div>
+        <input type="submit" value="Upload and Process">
+    </form>
+
+    <script>
+        // JavaScript code to handle logout
+        function logout() {
+            // Make an AJAX request to log out the user
+            const xhr = new XMLHttpRequest();
+            xhr.open('GET', '/logout', true);
+
+            xhr.onload = function() {
+                if (xhr.status === 200) {
+                    // Successful logout
+                    alert('Logged out'); // Show a confirmation message
+                    window.location.href = '/login'; // Redirect to the login page or a suitable destination
+                } else {
+                    // Failed to log out, handle the error
+                    alert('Logout failed');
+                }
+            };
+
+            xhr.send();
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            // Your JavaScript code here
+
+            // JavaScript code to display image preview with Base64 data URI
+            document.getElementById('imageInput').addEventListener('change', function() {
+                const imagePreview = document.getElementById('imagePreview');
+                const file = this.files[0];
+                const ipAddress = document.getElementById('ipAddress');
+
+                if (file) {
+                    const reader = new FileReader();
+
+                    reader.onload = function(e) {
+                        const img = document.createElement('img');
+                        img.src = e.target.result;
+                        img.style.maxWidth = '100%';
+                        imagePreview.innerHTML = '';
+                        imagePreview.appendChild(img);
+                        
+                        // Add small watermarks in a 3x3 grid
+                        for (let row = 0; row < 2; row++) {
+                            for (let col = 0; col < 2; col++) {
+                                const watermark = document.createElement('div');
+                                watermark.className = 'watermark';                                                                
+                                watermark.style.top = `${(row + 1) * (30)}%`; // Adjust the percentage for positioning
+                                watermark.style.left = `${(col + 1) * (30)}%`; // 
+                                watermark.innerText = ipAddress.textContent;
+                                imagePreview.appendChild(watermark);
+                                watermark.style.display = 'block'
+                            }
+                        }
+                    };
+
+                    reader.readAsDataURL(file);
+                } else {
+                    imagePreview.innerHTML = ''; // Clear the preview if no file is selected
+                }
+            });
+        });
+    </script>
+    <script>
+        // JavaScript code to fetch and display the client's IP address
+        fetch('/get_client_ip') // Replace with your server's endpoint
+            .then(response => response.text())
+            .then(data => {
+                const ipAddress = document.getElementById('ipAddress');
+                ipAddress.textContent = data;
+            })
+            .catch(error => {
+                console.error('Error fetching IP address:', error);
+                const ipAddress = document.getElementById('ipAddress');
+                ipAddress.textContent = 'Error fetching IP address';
+            });
+    </script>
 </body>
 </html>

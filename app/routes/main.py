@@ -18,3 +18,9 @@ def dashboard():
     username = request.args.get('username')
     
     return render_template('main/dashboard.html', username=username)
+
+@main_bp.route('/get_client_ip', methods=['GET'])
+@login_required  # This route requires authentication
+def get_client_ip():
+    client_ip = request.remote_addr
+    return f"{client_ip}"

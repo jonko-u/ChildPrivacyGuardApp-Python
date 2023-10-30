@@ -36,5 +36,6 @@ def upload_file():
             return redirect(request.url)
     return render_template('component/upload.html')
 
+
 # Other component-related routes and functions can be defined here
 

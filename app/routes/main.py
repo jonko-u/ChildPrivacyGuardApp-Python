@@ -1,6 +1,6 @@
 from flask import Blueprint, render_template, request
 from flask_login import login_required
-from app.picture_processing.picture_operations import encrypt_image, decrypt_image, download_image, upload_image
+from app.picture_processing.picture_operations import blur_picture,encrypt_image, decrypt_image, download_image, upload_image, get_images
 
 main_bp = Blueprint('main', __name__)
 
@@ -36,12 +36,25 @@ def picture_process():
         # Example: Save the image to a folder on the server
         id_filename = upload_image(image=image, image_filename=image_filename)
 
-
-
-        return f'Image uploaded and processed successfully {id_filename} '
+        encoded_image= blur_picture(image, id_filename)
+        return render_template('main/blur.html', encoded_image=encoded_image, id_filename=id_filename)
     
     # Handle the case where no image was uploaded
     return 'No image uploaded'
+
+@main_bp.route('/display_pictures')  # You can define additional routes
+@login_required  # This route requires authentication
+def display_pictures():
+    # Call a function to retrieve and display images
+    images = get_images()  # You can create a function to fetch images
+    
+    if images:
+        # Render a template to display images
+        return render_template('main/pictures.html', images=images)
+    else:
+        # Handle the case where no images were found
+        return 'No images available'
+
 
 @main_bp.route('/picture_decrypted')
 @login_required  # This route requires authentication

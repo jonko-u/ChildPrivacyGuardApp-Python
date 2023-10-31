@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Image Gallery</title>
+    <style>
+        /* Add your CSS styles here */
+        .image {
+            max-width: 400px; /* Set the maximum width of the images */
+            margin: 20px auto; /* Center the images horizontally */
+            display: block; /* Display each image as a block element */
+        }
+    </style>
+</head>
+<body>
+    <h1>Image Gallery</h1>
+
+    <div class="image-container">
+        {% for image in images %}
+            <img class="image" src="data:image/jpeg;base64,{{ image }}" alt="Image">
+        {% endfor %}
+    </div>
+</body>
+</html>

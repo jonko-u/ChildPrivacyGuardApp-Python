@@ -7,10 +7,10 @@ from cryptography.fernet import Fernet
 import face_recognition
 from dotenv import load_dotenv
 import os
-import logging
 import cv2
 import numpy as np
-from base64 import b64encode
+from base64 import b32encode, b64encode
+
 # Load environment variables from .env
 load_dotenv()
 
@@ -47,53 +47,26 @@ def upload_image(image, image_filename):
     return id_filename
 
 def encrypt_image(image_binary, encryption_key):    
+    # Create a Fernet object with the key
     fernet = Fernet(encryption_key)
+    # Encrypt the data of the image
     encrypted_image_data = fernet.encrypt(image_binary.getvalue())
     return encrypted_image_data
 
-def decrypt_image():
-
-    # Connecto to mongodb
-    db = connect_to_mongodb()
+def decrypt_image(image_id, db):
 
     # Create a Fernet object with the key
-    fernet = Fernet(secret_key)
-
-    image_id = ObjectId("654060104cfccebbf67bdcb1")  # Replace with the correct ObjectID
-
-    # Query the image by ID
+    fernet = Fernet(secret_key)    
     # Create a GridFS object
-    fs = GridFS(db, collection="fs")
-    encrypted_data = fs.find_one(filter={"_id" : image_id})
-    logging.warning(encrypted_data)
-    
+    fs = GridFS(db, collection="fese")
+    encrypted_data = fs.find_one(filter={"_id" : image_id})    
     # Decrypt the data
     decrypted_data = fernet.decrypt(encrypted_data.read())
+    return decrypted_data
+    
+def download_image(image_data):
 
-    image = Image.open(BytesIO(decrypted_data))
-    logging.warning(image)
-    # Specify the output filename and extension
-    output_filename = 'outputfile.jpg'  # Change the filename and extension as needed
-
-    # Save the image to the local file
-    image.save(output_filename)
-
-    print(f"Image saved locally as {output_filename}")
-
-def download_image():
-
-    # Connecto to mongodb
-    db = connect_to_mongodb()
-
-    image_id = ObjectId("654022bd927bb66bc693ed59")  # Replace with the correct ObjectID
-
-    # Query the image by ID
-    # Create a GridFS object
-    fs = GridFS(db, collection="fs")
-    encrypted_data = fs.find_one(filter={"_id" : image_id})
-    # Decrypt the data
-    print(encrypted_data)
-    image = Image.open(BytesIO(encrypted_data.read()))
+    image = Image.open(BytesIO(image_data))
 
     # Specify the output filename and extension
     output_filename = 'outputfile.jpg'  # Change the filename and extension as needed
@@ -147,33 +120,50 @@ def blur_picture(image, id_filename):
     output_buffer.seek(0)
     fs = GridFS(db, "blur")
     fs.put(output_buffer.getvalue(), filename=image.filename, _id= id_filename_blured, original_picture_id=id_filename, coordenates_of_boxes = coordenates_of_boxes)
-
-    
     
     # Serialize the data to a JSON string
 
     encoded_image = b64encode(output_buffer.read()).decode('utf-8')
     
     return encoded_image
-def upload_blur_picture_to_db(coordenates_dict):
-    # Connect to MongoDB
-    db = connect_to_mongodb()
+
 
 # Function to retrieve and decrypt images
 def get_images():
     db = connect_to_mongodb()
-
     # Create a GridFS object
     fs = GridFS(db,collection="blur")
 
     # Retrieve the image metadata from the 'my_custom_files' collection
     image_metadata = fs.find({})
-
-    images = []
-
-    for file_info in image_metadata:
+    # Create a dict where  { id : encoded_image}
+    images_loaded_dict = {}
+    # Loop al the images_metadata are
+    for file_info in image_metadata: 
+        # Read the file info       
         image_data = file_info.read()
-        encoded_image = b64encode(image_data).decode('utf-8')          
-        images.append(encoded_image)
+        # Encode the image metadata in base64
+        encoded_image = b64encode(image_data).decode('utf-8')
+        # Save in our dict the {id : encoded_image}
+        images_loaded_dict[str(file_info._id)] = encoded_image
+        
+    return images_loaded_dict
 
-    return images
+
+def get_original_image_db(image_id):
+    # Connect to mongo database
+    db = connect_to_mongodb()
+    # Create a GridFS object
+    fs = GridFS(db,collection="blur")
+    # Find the id of our blurred image
+    image_metadata = fs.find_one({"_id": ObjectId(image_id)})
+    # Get the id of the original picture
+    original_picture_id = image_metadata.original_picture_id
+    # Decrypt the image data
+    decrypted_data = decrypt_image(image_id=original_picture_id, db=db)
+    # Encode in base64 our clean data
+    encoded_image = b64encode(decrypted_data).decode('utf-8')
+
+    return encoded_image
+    
+

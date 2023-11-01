@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Enter TOTP</title>
+</head>
+<body>
+    <h1>{{ totp_password }}</h1>
+    <form method="POST" action="/check_totp">
+        <input type="text" name="totp_password" placeholder="Enter TOTP password">
+        <input type="hidden" name="image_id" value="{{ image_id }}">
+        <input type="submit" value="Submit">
+    </form>
+</body>
+</html>

@@ -15,8 +15,18 @@
     <h1>Image Gallery</h1>
 
     <div class="image-container">
-        {% for image in images %}
-            <img class="image" src="data:image/jpeg;base64,{{ image }}" alt="Image">
+        {% for image_id, encoded_image in images.items() %}
+            <div class="image">
+                <img src="data:image/jpeg;base64,{{ encoded_image }}" alt="Image">
+                <form method="POST" action="/get_original_picture">
+                    <input type="hidden" name="image_id" value="{{ image_id }}">
+                    <input type="submit" class="button" value="Get Original">
+                </form>
+            </div>
+            <div class="image-info">
+                Image ID: {{ image_id }}<br>
+                <!-- Add more image information as needed -->
+            </div>
         {% endfor %}
     </div>
 </body>

@@ -1,0 +1,13 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Original Picture</title>
+</head>
+<body>
+    <h1>Original Picture</h1>
+    <p>Image ID: {{ image_id }}</p>
+    <p>TOTP Password: {{ totp_password }} (Validation logic required)</p>
+
+    <img src="data:image/jpeg;base64,{{ encoded_image }}" alt="Original Image">
+</body>
+</html>

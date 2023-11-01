@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Countdown Page</title>
+</head>
+<body>
+    <h1>60-Second Countdown</h1>
+    <p id="countdown">60</p>
+    <button id="redirectButton">OK</button>
+
+    <script>
+        // Function to start the countdown
+        function startCountdown() {
+            let countdown = 60; // 60 seconds
+
+            function updateCountdown() {
+                document.getElementById('countdown').textContent = countdown;
+                countdown--;
+
+                if (countdown < 0) {
+                    // Redirect to /display_pictures when the countdown reaches 0
+                    window.location.href = '/display_pictures';
+                }
+            }
+
+            // Update the countdown every second
+            const countdownInterval = setInterval(updateCountdown, 1000);
+
+            // Handle the "OK" button click
+            document.getElementById('redirectButton').addEventListener('click', function () {
+                clearInterval(countdownInterval); // Stop the countdown
+                window.location.href = '/display_pictures'; // Redirect to /display_pictures
+            });
+        }
+
+        // Start the countdown when the page loads
+        startCountdown();
+    </script>
+</body>
+</html>
